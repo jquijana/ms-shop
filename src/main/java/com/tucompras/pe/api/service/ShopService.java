@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -53,5 +56,13 @@ public class ShopService implements IShopService {
   @Override
   public Mono<Void> deleteById(String id) {
     return shopRepository.deleteById(id);
+  }
+
+  @Override
+  public Flux<ShopDTO> saveAll(List<ShopDTO> shops) {
+    Flux<Shop> shopFlux =
+        shopRepository.saveAll(
+            shops.stream().map(x -> shopMapper.toShop(x)).collect(Collectors.toList()));
+    return shopFlux.map(x -> shopMapper.toShopDTO(x));
   }
 }
